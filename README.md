@@ -34,7 +34,7 @@ Removes old Job objects. This is intended for old Kubernetes versions which lack
 
 ## Installing
 
-Preferred metrhod to install is using helm:
+Preferred method to install is using helm:
 
 ```
 $ git clone https://github.com/getupcloud/tiny-controllers.git
