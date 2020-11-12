@@ -1,0 +1,46 @@
+resources:
+- group: ""
+  version: v1
+  kind: Namespace
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - project
+      - reconcile
+      debug: false
+    observe: true
+  validator:
+    exec:
+      command: /app/main.py
+      args:
+      - project
+      - reconcile
+
+- group: batch
+  version: v1
+  kind: Job
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - job
+      - reconcile
+      debug: false
+
+- group: ""
+  version: v1
+  kind: Node
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - node
+      - reconcile
+      debug: false
+
+webhook:
+  port: 8443
+  tls:
+    certFile: /etc/tls/tls.crt
+    keyFile: /etc/tls/tls.key
