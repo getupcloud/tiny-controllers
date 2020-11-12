@@ -44,7 +44,7 @@ def reconcile(state, config, *args):
     if not changed:
         return
 
-    state['object']['spec']['taints'] = node_taints
+    state['object']['spec']['taints'] = new_taints
     state['object']['metadata']['annotations'] = annotations
     state['object']['metadata']['labels'] = labels
 
