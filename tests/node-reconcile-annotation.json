@@ -1,0 +1,24 @@
+{
+    "object": {
+        "metadata": {
+            "annotations": {
+                "exists": "true"
+            },
+            "labels": {
+                "annotation.getup.io/myann": "myann-value",
+                "annotation.getup.io/some-ann": "some-ann-value"
+            }
+        },
+        "spec": {
+        }
+    },
+    "results": [
+        {
+            "metadata.annotations": {
+                "exists": "true",
+                "myann": "myann-value",
+                "some-ann": "some-ann-value"
+            }
+        }
+    ]
+}

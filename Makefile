@@ -1,4 +1,4 @@
-VERSION := v0.0.1
+VERSION := v0.0.2
 REPOSITORY := getupcloud
 IMAGE_NAME := tiny-controllers
 GIT_COMMIT := $(shell git log -n1 --oneline)
@@ -55,3 +55,6 @@ tls/tls.crt:
 dev-run: VERSION := $(VERSION)-dev
 dev-run: tls
 	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) --network=host -u nobody -v $(PWD)/dev-kubeconfig:/.kube/config -v $(PWD)/tls:/etc/tls/ $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(RECONCILER)
+
+test:
+	make -C tests

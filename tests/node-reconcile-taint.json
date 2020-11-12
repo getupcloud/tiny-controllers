@@ -1,0 +1,65 @@
+{
+    "object": {
+        "metadata": {
+            "annotations": {
+                "taint.getup.io/dedicated.value": "from-annotation",
+                "taint.getup.io/dedicated.effect": "NoSchedule"
+            },
+            "labels": {
+                "taint.getup.io/dedicated.value": "from-label",
+                "taint.getup.io/dedicated.operator": "Exists",
+
+                "taint.getup.io/test.value": "from-label",
+                "taint.getup.io/test.effect": "NoExecute",
+
+                "taint.getup.io/exists.value": "dup",
+                "taint.getup.io/exists.effect": "NoDuplicate"
+            }
+        },
+        "spec": {
+            "taints": [
+                {
+                    "effect": "NoExecute",
+                    "key": "k",
+                    "value": "v"
+                },
+                {
+                    "effect": "NoDuplicate",
+                    "key": "exists",
+                    "value": "dup"
+                }
+            ]
+        }
+    },
+    "results": [
+        {
+            "spec.taints": [
+                {
+                    "effect": "NoExecute",
+                    "key": "k",
+                    "value": "v"
+                },
+                {
+                    "effect": "NoDuplicate",
+                    "key": "exists",
+                    "value": "dup"
+                },
+                {
+                  "key": "dedicated",
+                  "value": "from-label",
+                  "operator": "Exists"
+                },
+                {
+                  "key": "test",
+                  "value": "from-label",
+                  "effect": "NoExecute"
+                },
+                {
+                  "key": "dedicated",
+                  "value": "from-annotation",
+                  "effect": "NoSchedule"
+                }
+            ]
+        }
+    ]
+}

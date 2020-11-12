@@ -1,6 +1,6 @@
-import itertools
 import os
 import json
+import copy
 from controllers import log
 
 def reconcile(state, config, *args):
@@ -9,7 +9,7 @@ def reconcile(state, config, *args):
     labels = metadata.get('labels',{})
     name = metadata.get('name')
     uid = metadata.get('uid')
-    taints = state.get('object',{}).get('spec',{}).get('taints', [])
+    node_taints = state.get('object',{}).get('spec',{}).get('taints', [])
 
     # copy label to annotation
     for prefix_name, value in labels.items():
@@ -31,35 +31,49 @@ def reconcile(state, config, *args):
         log('Added label: {}={}'.format(name, value))
         labels[name] = value
 
-    # taint from labels or annotations
-    for prefix_name, value in itertools.chain(labels.items(), annotations.items()):
-        if not prefix_name.startswith('taint.getup.io/'):
-            continue
-        _, name = prefix_name.split('/')
-        if not name:
-            continue
-        try:
-            taint = json.loads(value)
-        except json.decoder.JSONDecodeError:
-            tmp = value.split(':')
-            taint = {
-                'key': name,
-                'value': tmp[0],
-                'effect': tmp[1] if len(tmp) > 1 else os.environ.get('DEFAULT_NODE_TAINT_EFFECT', 'NoSchedule'),
-            }
+    node_taints = reconcile_taints(labels, node_taints)
+    node_taints = reconcile_taints(annotations, node_taints)
 
-        found = False
-        for t in taints:
-            if t['effect'] == taint['effect'] and t['key'] == taint['key'] and t['value'] == taint['value']:
-                found = True
-                break
-        if found:
-            continue
-        log('Added taint: {}'.format(taint))
-        taints.append(taint)
-
-    state['object']['spec']['taints'] = taints
+    state['object']['spec']['taints'] = node_taints
     state['object']['metadata']['annotations'] = annotations
     state['object']['metadata']['labels'] = labels
 
     return state
+
+def reconcile_taints(source, node_taints=[]):
+    '''Taints from labels or annotations
+    Example for key=dedicated:
+      taint.getup.io/dedicated.value: infra
+      taint.getup.io/dedicated.effect: NoSchedule
+      taint.getup.io/dedicated.operator: Exists
+    '''
+    node_taints = copy.deepcopy(node_taints)
+    new_taints = {}
+    default_effect = os.environ.get('DEFAULT_NODE_TAINT_EFFECT', 'NoSchedule')
+
+    for prefix_name, value in source.items():
+        if not prefix_name.startswith('taint.getup.io/'):
+            continue
+        _, tmp = prefix_name.split('/')
+        key, field = tmp.split('.')
+
+        if key not in new_taints:
+            new_taints[key] = {'key': key}
+
+        new_taints[key][field] = value
+
+    taints_to_add = []
+    for new_taint in new_taints.values():
+        found = False
+        for node_taint in node_taints:
+            if node_taint == new_taint:
+                log('Already exists taint: {}'.format(new_taint))
+                found = True
+        if not found:
+            taints_to_add.append(new_taint)
+
+    for taint in taints_to_add:
+        log('Adding taint: {}'.format(taint))
+        node_taints.append(taint)
+
+    return node_taints

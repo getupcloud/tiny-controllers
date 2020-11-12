@@ -62,7 +62,7 @@ $ make release
 Use make vars to overwrite defaults:
 
 ```
-$ make release VERSION=v0.0.1 REPOSITORY=getupcloud IMAGE_NAME=getup-controller
+$ make release VERSION=v0.0.1 REPOSITORY=getupcloud IMAGE_NAME=tiny-controllers
 ```
 
 Look into Makefile for more targets.

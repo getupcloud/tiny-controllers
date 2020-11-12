@@ -1,0 +1,25 @@
+{
+    "object": {
+        "metadata": {
+            "annotations": {
+                "label.getup.io/mylabel": "mylabel-value",
+                "label.getup.io/some-label": "some-label-value",
+                "annotation": "something"
+            },
+            "labels": {
+                "exists": "true"
+            }
+        },
+        "spec": {
+        }
+    },
+    "results": [
+        {
+            "metadata.labels": {
+                "exists": "true",
+                "mylabel": "mylabel-value",
+                "some-label": "some-label-value"
+            }
+        }
+    ]
+}
