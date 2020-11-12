@@ -22,5 +22,5 @@ RUN apk add jq curl bind-tools --no-cache && \
     ) > /app/.version
 
 WORKDIR /app
-
+USER nobody
 ENTRYPOINT ["/app/entrypoint"]

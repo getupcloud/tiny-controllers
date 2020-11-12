@@ -10,6 +10,7 @@ def reconcile(state, config, *args):
     name = metadata.get('name')
     uid = metadata.get('uid')
     node_taints = state.get('object',{}).get('spec',{}).get('taints', [])
+    changed = False
 
     # copy label to annotation
     for prefix_name, value in labels.items():
@@ -20,6 +21,7 @@ def reconcile(state, config, *args):
             continue
         log('Added annotation: {}={}'.format(name, value))
         annotations[name] = value
+        changed = True
 
     # copy annotation to label
     for prefix_name, value in annotations.items():
@@ -30,9 +32,17 @@ def reconcile(state, config, *args):
             continue
         log('Added label: {}={}'.format(name, value))
         labels[name] = value
+        changed = True
 
-    node_taints = reconcile_taints(labels, node_taints)
-    node_taints = reconcile_taints(annotations, node_taints)
+    new_taints = copy.deepcopy(node_taints)
+    new_taints = reconcile_taints(labels, new_taints)
+    new_taints = reconcile_taints(annotations, new_taints)
+
+    if new_taints != node_taints:
+        changed = True
+
+    if not changed:
+        return
 
     state['object']['spec']['taints'] = node_taints
     state['object']['metadata']['annotations'] = annotations
@@ -40,7 +50,7 @@ def reconcile(state, config, *args):
 
     return state
 
-def reconcile_taints(source, node_taints=[]):
+def reconcile_taints(source, node_taints):
     '''Taints from labels or annotations
     Example for key=dedicated:
       taint.getup.io/dedicated.value: infra

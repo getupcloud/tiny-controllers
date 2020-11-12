@@ -1,11 +1,18 @@
-VERSION := v0.0.2
+VERSION := v0.0.3
 REPOSITORY := getupcloud
 IMAGE_NAME := tiny-controllers
 GIT_COMMIT := $(shell git log -n1 --oneline)
 GIT_COMMIT_ID := $(shell git log -n 1 --pretty=format:%h)
 BUILD_DATE := $(shell LC_ALL=C date -u)
 
-all: docker-build-release
+all: docker-build-release help
+
+help:
+	@echo Available targets:
+	@echo " " docker-build-release, docker-tag-latest
+	@echo " " docker-push-release, docker-push-latest
+	@echo " " git-tag-release, git-push-main, git-push-release
+	@echo " " dev, dev-run, test
 
 release: check-dirty docker-build-release docker-tag-latest git-tag-release git-push-main git-push-release docker-push-release docker-push-latest
 
