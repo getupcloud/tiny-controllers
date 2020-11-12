@@ -76,7 +76,7 @@ def reconcile_taints(source, node_taints):
     for new_taint in new_taints.values():
         found = False
         for node_taint in node_taints:
-            if node_taint == new_taint:
+            if equal_taints(node_taint, new_taint):
                 log('Already exists taint: {}'.format(new_taint))
                 found = True
         if not found:
@@ -87,3 +87,11 @@ def reconcile_taints(source, node_taints):
         node_taints.append(taint)
 
     return node_taints
+
+def equal_taints(a, b):
+    eq = False
+    try:
+        eq = a['key'] == b['key'] and a['effect'] == b['effect']
+    except KeyError:
+        pass
+    return eq
