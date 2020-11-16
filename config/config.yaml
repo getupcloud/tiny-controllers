@@ -1,25 +1,7 @@
 resources:
-- group: ""
+- kind: Job
+  group: batch
   version: v1
-  kind: Namespace
-  reconciler:
-    exec:
-      command: /app/main.py
-      args:
-      - project
-      - reconcile
-      debug: false
-    observe: true
-  validator:
-    exec:
-      command: /app/main.py
-      args:
-      - project
-      - reconcile
-
-- group: batch
-  version: v1
-  kind: Job
   reconciler:
     exec:
       command: /app/main.py
@@ -28,14 +10,36 @@ resources:
       - reconcile
       debug: false
 
-- group: ""
+- kind: Node
+  group: ""
   version: v1
-  kind: Node
   reconciler:
     exec:
       command: /app/main.py
       args:
       - node
+      - reconcile
+      debug: false
+
+- kind: PrometheusRules
+  group: monitoring.coreos.com
+  version: v1
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - patch
+      - reconcile
+      debug: false
+
+- kind: Deployment
+  group: 'apps'
+  version: v1
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - patch
       - reconcile
       debug: false
 

@@ -108,3 +108,7 @@ def equal_taints(a, b):
     except KeyError:
         pass
     return eq
+
+
+def init(config, controller_config):
+    pass

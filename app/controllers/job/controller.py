@@ -16,3 +16,7 @@ def reconcile(state, config, *args):
 
     state['object']['metadata']['finalizers'] = finalizers
     return state
+
+
+def init(config, controller_config):
+    pass

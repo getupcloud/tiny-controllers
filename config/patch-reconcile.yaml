@@ -1,0 +1,37 @@
+paths:
+  kubectl: /usr/bin/kubectl
+  jq: /usr/bin/jq
+
+resources:
+- kind: Deployment
+  apiVersion: apps/v1
+  patches:
+  - name: demo
+    namespace: demo
+    specs:
+    - jq: |-
+        (.spec.template.spec.containers[] | select(.name=="sidecar")).resources |= {"limits":{"cpu":"100m","memory":"1Gi"}}
+    - json: {}
+    - strategic: {}
+    - merge:
+        spec:
+          replicas:
+            1
+
+- kind: PrometheusRule
+  apiVersion: monitoring.coreos.com/v1
+  patches:
+  - name: loki
+    namespace: monitoring
+    specs:
+    - json: {}
+    - strategic: {}
+    - merge: {}
+    - python: |-
+        for g in state['object']['spec']['groups']:
+          if g['name'] == 'loki.rules':
+            for r in g['rules']:
+              if r['alert'] == 'alert1':
+                r['labels']['severity'] = 'warning'
+    - jq: |-
+        (.spec.groups[] | select(.name=="loki.rules") | .rules[]| select (.alert=="alert1") | .for) |= "1h"

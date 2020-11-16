@@ -1,0 +1,39 @@
+{
+    "object": {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "demo",
+        "namespace": "demo"
+      },
+      "spec": {
+        "replicas": 0,
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "nginx"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "demo",
+                "image": "nginx"
+              },
+              {
+                "name": "sidecar",
+                "image": "nginx"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "results": [
+        {
+            "spec.replicas": 1,
+            "spec.template.spec.containers.1.resources.limits.cpu": "100m",
+            "spec.template.spec.containers.1.resources.limits.memory": "1Gi"
+        }
+    ]
+}

@@ -4,9 +4,12 @@ cd /app
 source /app/.version
 
 export PYTHONPATH=/app
+export CONFIG_FILE=${CONFIG_FILE:-/config/config.yaml}
+
+python init.py "$CONFIG_FILE"
 
 if ${LOG_LINES:-false}; then
-    exec /bin/whitebox-controller -c /config/config.yaml 2>&1 | jq -r '[(.ts|todateiso8601),(.level|ascii_upcase),.msg]|@tsv' | tr -s "\t" " "
+    exec /bin/whitebox-controller -c "$CONFIG_FILE" 2>&1 | jq -r '[(.ts|todateiso8601),(.level|ascii_upcase),.msg]|@tsv' | tr -s "\t" " "
 else
-    exec /bin/whitebox-controller -c /config/config.yaml
+    exec /bin/whitebox-controller -c "$CONFIG_FILE"
 fi

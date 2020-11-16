@@ -21,6 +21,6 @@ RUN apk add jq curl bind-tools --no-cache && \
         echo "GIT_COMMIT_ID=\"$GIT_COMMIT_ID\""; \
     ) > /app/.version
 
-WORKDIR /app
+WORKDIR /
 USER nobody
 ENTRYPOINT ["/app/entrypoint"]

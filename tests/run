@@ -7,18 +7,31 @@ RESET="$(tput sgr0)"
 BOLD="$(tput bold)"
 GREEN="$(tput setaf 2)"
 RED="$(tput setaf 1)"
+FILES=${FILES:-*.json}
 
-for i in *.json; do
+for file in ${FILES}; do
+    tst="${file%.json}"
     echo
-    echo -e "${BOLD}=== Testing $i ===${RESET}"
-    kind=$(echo $i| cut -f1 -d-)
-    type=$(echo $i| cut -f2 -d-)
-    python ../app/main.py $kind $type < $i | python ./check-result.py $i
+    echo -e "${BOLD}=== Testing $file ===${RESET}"
+    kind=$(cut -f1 -d- <<<$tst)
+    type=$(cut -f2 -d- <<<$tst)
+
+    configfile="${kind}-${type}-conf.yaml"
+    if [ -e "$configfile" ]; then
+        echo CONTROLLER_CONFIG_${kind^^}=$configfile
+        export CONTROLLER_CONFIG_${kind^^}=$configfile
+    fi
+
+    echo "$ python ../app/main.py $kind $type < $file | python ./check-result.py $file"
+    python ../app/main.py $kind $type < $file | python ./check-result.py $file
 
     if [ "${PIPESTATUS[*]}" == "0 0" ]; then
         echo -e "${GREEN}Passed"
     else
         echo -e "${RED}Failed"
+        err=1
     fi
     echo -ne "$RESET"
 done
+
+exit ${err:-0}

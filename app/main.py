@@ -1,28 +1,10 @@
 #!/usr/bin/env python
 
-import os
 import sys
-import yaml
 import json
 import logging
-import importlib
-from controllers import log
+from controllers import log, load_config, load_controller
 
-
-def load_config(controller_name, controller_type):
-    config = {}
-    config_file = os.environ.get("CONTROLLER_CONFIG_{}".format(controller_name.upper()), "/config/{}-{}.yaml".format(controller_name, controller_type))
-
-    try:
-        with open(config_file, 'r') as cf:
-            config = yaml.safe_load(cf)
-    except FileNotFoundError as ex:
-        pass
-    except Exception as ex:
-        log("Error loading config[%s:%s]: %s: %s" % (controller_name, controller_type, config_file, str(ex)))
-        sys.exit(1)
-
-    return config
 
 if __name__ == "__main__":
     try:
@@ -33,10 +15,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        controller = importlib.import_module('controllers.{}'.format(controller_name))
-        func = getattr(controller, controller_type)
-
-        config = load_config(controller_name, controller_type)
+        controller, func = load_controller(controller_name, controller_type)
+        config = load_config(controller_name=controller_name, controller_type=controller_type)
         state = json.load(sys.stdin)
 
         result = func(state, config, *args)
