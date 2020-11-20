@@ -7,12 +7,18 @@ ARG BUILD_DATE
 ARG GIT_COMMIT
 ARG GIT_COMMIT_ID
 ARG COMPILE=true
+ARG KUBECTL_VERSION
 
 COPY --from=base /bin/whitebox-controller /bin/whitebox-controller
 COPY app /app
 COPY config /config
 
 RUN apk add jq curl bind-tools --no-cache && \
+    \
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
+    mv kubectl /usr/bin/kubectl && \
+    chmod +x /usr/bin/kubectl && \
+    \
     find /app -name requirements.txt | xargs -P 1 -r -t pip install -r && \
     ( \
         echo "VERSION=\"$VERSION\""; \

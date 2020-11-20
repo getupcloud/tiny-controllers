@@ -1,9 +1,10 @@
-VERSION := v0.0.6
+VERSION := v0.0.7
 REPOSITORY := getupcloud
 IMAGE_NAME := tiny-controllers
 GIT_COMMIT := $(shell git log -n1 --oneline)
 GIT_COMMIT_ID := $(shell git log -n 1 --pretty=format:%h)
 BUILD_DATE := $(shell LC_ALL=C date -u)
+KUBECTL_VERSION := 1.18.12
 
 all: docker-build-release help
 
@@ -29,7 +30,8 @@ docker-build-release:
         --build-arg VERSION="$(VERSION)" \
         --build-arg BUILD_DATE="$(BUILD_DATE)" \
         --build-arg GIT_COMMIT="$(GIT_COMMIT)" \
-        --build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)"
+        --build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)" \
+        --build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
 
 docker-tag-latest:
 	docker tag $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(REPOSITORY)/$(IMAGE_NAME):latest
