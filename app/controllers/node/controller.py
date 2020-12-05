@@ -17,7 +17,7 @@ def reconcile(state, config, *args):
     for prefix_name, value in labels.items():
         if not prefix_name.startswith('annotation.getup.io/'):
             continue
-        _, name = prefix_name.split('/')
+        _, name = prefix_name.split('/', 1)
         if not name:
             continue
         log('Added annotation: {}={}'.format(name, value))
@@ -28,7 +28,7 @@ def reconcile(state, config, *args):
     for prefix_name, value in annotations.items():
         if not prefix_name.startswith('label.getup.io/'):
             continue
-        _, name = prefix_name.split('/')
+        _, name = prefix_name.split('/', 1)
         if not name:
             continue
         log('Added label: {}={}'.format(name, value))
@@ -69,7 +69,7 @@ def reconcile_taints(source, node_taints):
     for prefix_name, value in source.items():
         if not prefix_name.startswith('taint.getup.io/'):
             continue
-        _, tmp = prefix_name.split('/')
+        _, tmp = prefix_name.split('/', 1)
         key, field = tmp.split('.')
 
         if key not in new_taints:
