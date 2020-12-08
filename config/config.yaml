@@ -43,6 +43,23 @@ resources:
       - reconcile
       debug: false
 
+- kind: PersistentVolume
+  group: ""
+  version: v1
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - volume-label
+      - reconcile
+      debug: false
+  references:
+  - group: ""
+    version: v1
+    kind: PersistentVolumeClaim
+    nameFieldPath: ".spec.claimRef.name"
+
+
 webhook:
   port: 8443
   tls:

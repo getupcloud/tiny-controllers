@@ -1,0 +1,55 @@
+{
+    "object": {
+        "kind": "PersistentVolume",
+        "metadata": {
+            "annotations": {
+                "exists": "true"
+            },
+            "labels": {
+                "mylabel": "ok"
+            }
+        },
+        "spec": {
+            "claimRef": {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "name": "mypvc",
+                "namespace": "monitoring"
+            }
+        }
+    },
+    "references": {
+        "persistentvolumeclaim.v1": [
+            {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "metadata": {
+                    "name": "mypvc",
+                    "namespace": "monitoring",
+                    "annotations": {
+                        "pv.label.getup.io/label-from-ann": "true",
+                        "pv.annotation.getup.io/ann-from-ann": "true",
+                        "some-ann": "some-ann-value"
+                    },
+                    "labels": {
+                        "pv.label.getup.io/foo.io/label-from-label": "true",
+                        "pv.annotation.getup.io/bar.io/ann-from-label": "true",
+                        "some-label": "some-label-value"
+                    }
+                }
+            }
+        ]
+    },
+    "results": [
+        {
+            "metadata.labels": {
+                "foo.io/label-from-label": "true",
+                "label-from-ann": "true"
+            },
+            "metadata.annotations": {
+                "ann-from-ann": "true",
+                "bar.io/ann-from-label": "true"
+            }
+        }
+    ]
+}
