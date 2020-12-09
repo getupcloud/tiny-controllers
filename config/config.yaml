@@ -50,7 +50,7 @@ resources:
     exec:
       command: /app/main.py
       args:
-      - volume-label
+      - volume
       - reconcile
       debug: false
   references:
@@ -58,6 +58,7 @@ resources:
     version: v1
     kind: PersistentVolumeClaim
     nameFieldPath: ".spec.claimRef.name"
+    namespaceFieldPath: ".spec.claimRef.namespace"
 
 
 webhook:

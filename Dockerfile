@@ -1,4 +1,5 @@
-FROM summerwind/whitebox-controller:latest AS base
+#FROM summerwind/whitebox-controller:latest AS base
+FROM caruccio/whitebox-controller:latest AS base
 
 FROM python:3.6-alpine
 
