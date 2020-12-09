@@ -22,10 +22,10 @@ def reconcile(state, config, *args):
 
     pv = state.get('object')
     pv_metadata = pv.get('metadata', {})
-    pv_annotations = pv_metadata.get('annotations', {})
-    pv_labels = pv_metadata.get('labels', {})
+    pv_annotations = copy.deepcopy(pv_metadata.get('annotations', {}))
+    pv_labels = copy.deepcopy(pv_metadata.get('labels', {}))
 
-    def copy_from(target, prefix, name, value):
+    def update(target, prefix, name, value):
         name = name[len(prefix):]
         if name:
             what = prefix.split('.')[1]
@@ -36,9 +36,9 @@ def reconcile(state, config, *args):
     # copy pvc labels or annotations to pv
     for name, value in itertools.chain(pvc_labels.items(), pvc_annotations.items()):
         if name.startswith(annotation_prefix):
-            pv_annotations = copy_from(pv_annotations, annotation_prefix, name, value)
+            pv_annotations = update(pv_annotations, annotation_prefix, name, value)
         elif name.startswith(label_prefix):
-            pv_labels = copy_from(pv_labels, label_prefix, name, value)
+            pv_labels = update(pv_labels, label_prefix, name, value)
 
     state['object']['metadata']['annotations'] = pv_annotations
     state['object']['metadata']['labels'] = pv_labels
