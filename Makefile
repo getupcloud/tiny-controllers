@@ -1,4 +1,4 @@
-VERSION := v0.0.10-test2
+VERSION := v0.1.0
 REPOSITORY := getupcloud
 IMAGE_NAME := tiny-controllers
 GIT_COMMIT := $(shell git log -n1 --oneline)
