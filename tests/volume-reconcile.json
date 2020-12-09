@@ -27,13 +27,13 @@
                     "name": "mypvc",
                     "namespace": "monitoring",
                     "annotations": {
-                        "pv.label.getup.io/label-from-ann": "true",
-                        "pv.annotation.getup.io/ann-from-ann": "true",
+                        "pv.label.getup.io.label-from-ann": "true",
+                        "pv.annotation.getup.io.ann-from-ann": "true",
                         "some-ann": "some-ann-value"
                     },
                     "labels": {
-                        "pv.label.getup.io/foo.io/label-from-label": "true",
-                        "pv.annotation.getup.io/bar.io/ann-from-label": "true",
+                        "pv.label.getup.io.foo.io/label-from-label": "true",
+                        "pv.annotation.getup.io.bar.io/ann-from-label": "true",
                         "some-label": "some-label-value"
                     }
                 }

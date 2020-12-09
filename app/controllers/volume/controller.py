@@ -4,6 +4,11 @@ import copy
 from controllers import log
 import itertools
 
+
+annotation_prefix = 'pv.annotation.getup.io.'
+label_prefix = 'pv.label.getup.io.'
+
+
 def reconcile(state, config, *args):
     pvcs = state.get('references', {}).get('persistentvolumeclaim.v1')
 
@@ -20,22 +25,20 @@ def reconcile(state, config, *args):
     pv_annotations = pv_metadata.get('annotations', {})
     pv_labels = pv_metadata.get('labels', {})
 
-    def copy_from(target, prefix_name, value):
-        _, name = prefix_name.split('/', 1)
+    def copy_from(target, prefix, name, value):
+        name = name[len(prefix):]
         if name:
-            what = prefix_name.split('.')[1]
+            what = prefix.split('.')[1]
             log('Added {}: {}={}'.format(what, name, value))
             target[name] = value
         return target
 
     # copy pvc labels or annotations to pv
-    for prefix_name, value in itertools.chain(pvc_labels.items(), pvc_annotations.items()):
-        if prefix_name.startswith('pv.annotation.getup.io/'):
-            pv_annotations = copy_from(pv_annotations, prefix_name, value)
-        elif prefix_name.startswith('pv.label.getup.io/'):
-            pv_labels = copy_from(pv_labels, prefix_name, value)
-        else:
-            changed = False
+    for name, value in itertools.chain(pvc_labels.items(), pvc_annotations.items()):
+        if name.startswith(annotation_prefix):
+            pv_annotations = copy_from(pv_annotations, annotation_prefix, name, value)
+        elif name.startswith(label_prefix):
+            pv_labels = copy_from(pv_labels, label_prefix, name, value)
 
     state['object']['metadata']['annotations'] = pv_annotations
     state['object']['metadata']['labels'] = pv_labels

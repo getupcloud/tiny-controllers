@@ -4,6 +4,11 @@ import copy
 from controllers import log
 
 
+annotation_prefix = 'annotation.getup.io.'
+label_prefix = 'label.getup.io.'
+taint_prefix = 'taint.getup.io.'
+
+
 def reconcile(state, config, *args):
     metadata = state.get('object',{}).get('metadata',{})
     annotations = metadata.get('annotations',{})
@@ -14,10 +19,10 @@ def reconcile(state, config, *args):
     changed = False
 
     # copy label to annotation
-    for prefix_name, value in labels.items():
-        if not prefix_name.startswith('annotation.getup.io/'):
+    for name, value in labels.items():
+        if not name.startswith(annotation_prefix):
             continue
-        _, name = prefix_name.split('/', 1)
+        name = name[len(annotation_prefix):]
         if not name:
             continue
         log('Added annotation: {}={}'.format(name, value))
@@ -25,10 +30,10 @@ def reconcile(state, config, *args):
         changed = True
 
     # copy annotation to label
-    for prefix_name, value in annotations.items():
-        if not prefix_name.startswith('label.getup.io/'):
+    for name, value in annotations.items():
+        if not name.startswith(label_prefix):
             continue
-        _, name = prefix_name.split('/', 1)
+        name = name[len(label_prefix):]
         if not name:
             continue
         log('Added label: {}={}'.format(name, value))
@@ -57,19 +62,19 @@ def reconcile(state, config, *args):
 def reconcile_taints(source, node_taints):
     '''Taints from labels or annotations
     Example for key=dedicated:
-      taint.getup.io/dedicated.value: infra
-      taint.getup.io/dedicated.effect: NoSchedule
-      taint.getup.io/dedicated.operator: Exists
+      taint.getup.io.dedicated.value: infra
+      taint.getup.io.dedicated.effect: NoSchedule
+      taint.getup.io.dedicated.operator: Exists
     '''
     node_taints = copy.deepcopy(node_taints)
     new_taints = {}
     default_effect = os.environ.get('DEFAULT_NODE_TAINT_EFFECT', 'NoSchedule')
 
     # read all taints from source
-    for prefix_name, value in source.items():
-        if not prefix_name.startswith('taint.getup.io/'):
+    for name, value in source.items():
+        if not name.startswith(taint_prefix):
             continue
-        _, tmp = prefix_name.split('/', 1)
+        tmp = name[len(taint_prefix):]
         key, field = tmp.split('.')
 
         if key not in new_taints:

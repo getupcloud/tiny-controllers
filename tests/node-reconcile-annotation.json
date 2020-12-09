@@ -5,8 +5,8 @@
                 "exists": "true"
             },
             "labels": {
-                "annotation.getup.io/myann": "myann-value",
-                "annotation.getup.io/some-ann": "some-ann-value"
+                "annotation.getup.io.myann": "myann-value",
+                "annotation.getup.io.some-ann": "some-ann-value"
             }
         },
         "spec": {

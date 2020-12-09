@@ -2,8 +2,8 @@
     "object": {
         "metadata": {
             "annotations": {
-                "label.getup.io/mylabel": "mylabel-value",
-                "label.getup.io/some-label": "some-label-value",
+                "label.getup.io.mylabel": "mylabel-value",
+                "label.getup.io.some-label": "some-label-value",
                 "annotation": "something"
             },
             "labels": {

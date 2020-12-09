@@ -2,18 +2,18 @@
     "object": {
         "metadata": {
             "annotations": {
-                "taint.getup.io/dedicated_annotation.value": "from-annotation",
-                "taint.getup.io/dedicated_annotation.effect": "NoSchedule"
+                "taint.getup.io.dedicated_annotation.value": "from-annotation",
+                "taint.getup.io.dedicated_annotation.effect": "NoSchedule"
             },
             "labels": {
-                "taint.getup.io/dedicated_label.value": "from-label",
-                "taint.getup.io/dedicated_label.operator": "Exists",
+                "taint.getup.io.dedicated_label.value": "from-label",
+                "taint.getup.io.dedicated_label.operator": "Exists",
 
-                "taint.getup.io/exists.value": "dup",
-                "taint.getup.io/exists.effect": "NoDuplicate",
+                "taint.getup.io.exists.value": "dup",
+                "taint.getup.io.exists.effect": "NoDuplicate",
 
-                "taint.getup.io/test.value": "from-label",
-                "taint.getup.io/test.effect": "NoExecute"
+                "taint.getup.io.test.value": "from-label",
+                "taint.getup.io.test.effect": "NoExecute"
             }
         },
         "spec": {
