@@ -1,4 +1,15 @@
 resources:
+- kind: Event
+  group: events.k8s.io
+  version: v1
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - event
+      - reconcile
+      debug: false
+
 - kind: Job
   group: batch
   version: v1
