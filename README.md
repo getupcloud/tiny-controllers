@@ -6,25 +6,22 @@ Tiny kubernetes controllers for tiny common tasks.
 
 ### Node Reconciler
 
-Apply labels, annotations and tatins from:
+Apply labels, annotations and taints from:
 
-- node annotations started with `label.getup.io/$name` and `taint.getup.io/`
-- node labels started with `annotation.getup.io/$name` and `taint.getup.io/`
+- node annotations started with `label.getup.io/$name` and `taint.getup.io.$name.[$value,$operator]`
+- node labels started with `annotation.getup.io/$name` and `taint.getup.io.$name.[$value,$operator]`
 
 Examples:
 
 ```
 # Set node annotation `my-annotation: value` from label:
-$ kubectl label node node1 annotation.getup.io/my-annotation=value
-
-# Set node taint dedicated=gpu:Noschedule from label:
-$ kubectl label node node1 taint.getup.io/dedicated=gpu:NoSchedule
-
-# Set node taint dedicated=gpu:Noschedule from label, using json value:
-$ kubectl label node node1 'taint.getup.io/foo={"key":"dedicated","value":"gpu","effect":"NoSchedule"}'
+$ kubectl label node node1 annotation.getup.io.my-annotation=value
 
 # Set node label my-label=123 from annotation:
-$ kubectl annotate node node1 label.getup.io/my-label=123
+$ kubectl annotate node node1 label.getup.io.my-label=123
+
+# Set node taint dedicated=gpu:NoSchedule from label:
+$ kubectl label node node1 taint.getup.io.dedicated.gpu=NoSchedule
 ```
 
 ### Job Cleanup
