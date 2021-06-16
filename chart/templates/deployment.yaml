@@ -1,0 +1,63 @@
+{{- range $name, $config := $.Values.controllers -}}
+{{- if $config.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tiny-controllers.fullname" . }}
+  labels: {{ include "tiny-controllers.labels" . | nindent 4 }}
+  annotations: {{ toYaml $.Values.podAnnotations | nindent 4 }}
+spec:
+  replicas: {{ default $.Values.replicas $config.replicas }}
+  selector:
+    matchLabels:
+      {{ include "tiny-controllers.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations: {{ toYaml $.Values.podAnnotations | nindent 8 }}
+      labels: {{- include "tiny-controllers.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets: {{ toYaml $.Values.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ include "tiny-controllers.serviceAccountName" . }}
+      securityContext: {{ toYaml $.Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ $name }}
+        image: {{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}
+        {{- if $.Values.image.pullPolicy }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        {{- end }}
+        env: {{ concat $config.env (list (dict "name" "CONFIG_FILE" "value" (printf "/config/config-%s.yaml" $name))) | toYaml | nindent 10 }}
+        ports:
+        {{- if and $config.webhook.enabled $.Values.validatingwebhook.enabled }}
+        - name: webhook-{{ $name }}
+          containerPort: {{ $config.webhook.port }}
+          protocol: TCP
+        {{- end }}
+        {{- if $config.monitoring.enabled }}
+        - name: metrics-{{ $name }}
+          containerPort: {{ $config.monitoring.port }}
+          protocol: TCP
+        {{- end }}
+        resources: {{ toYaml $config.resources | nindent 10 }}
+        securityContext: {{ toYaml $config.securityContext | nindent 10 }}
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        {{- if and $config.webhook.enabled $.Values.validatingwebhook.enabled }}
+        - name: certs
+          mountPath: /etc/tls
+        {{- end }}
+
+      nodeSelector: {{ toYaml $.Values.nodeSelector | nindent 8 }}
+      affinity: {{ toYaml $.Values.affinity | nindent 8 }}
+      tolerations: {{ toYaml $.Values.tolerations | nindent 8}}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "tiny-controllers.fullname" . }}-config
+      {{- if and $.Values.validatingwebhook.enabled $config.webhook.enabled }}
+      - name: certs
+        secret:
+          secretName: {{ include "tiny-controllers.ctlname" . }}-webhook-tls
+      {{- end }}
+{{- end }}
+{{- end }}

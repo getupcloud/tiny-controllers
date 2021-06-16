@@ -1,0 +1,25 @@
+{{- range $name, $config := $.Values.controllers }}
+{{- if and $config.enabled .Values.validatingwebhook.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "tiny-controllers.fullname" . }}-{{ $name }}-webhook-tls
+  labels:
+    {{- include "tiny-controllers.labels" . | nindent 4 }}
+spec:
+  secretName: {{ include "tiny-controllers.fullname" . }}-{{ $name }}
+  duration: 87600h
+  isCA: true
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  dnsNames:
+  - {{ include "tiny-controllers.fullname" . }}-{{ $name }}
+  - {{ include "tiny-controllers.fullname" . }}-{{ $name }}.{{ .Release.Namespace }}.svc
+  - {{ include "tiny-controllers.fullname" . }}-{{ $name }}.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    kind: ClusterIssuer
+    name: {{ .Values.validatingwebhook.clusterissuer }}
+{{- end }}
+{{- end }}

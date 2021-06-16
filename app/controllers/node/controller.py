@@ -18,6 +18,9 @@ def reconcile(state, config, *args):
     node_taints = state.get('object',{}).get('spec',{}).get('taints', [])
     changed = False
 
+    # ensure labels from config
+    if 'ensure; 
+
     # copy label to annotation
     for name, value in labels.items():
         if not name.startswith(annotation_prefix):

@@ -9,21 +9,32 @@ def log(*vargs, **kwargs):
 
 
 def load_config(controller_name=None, controller_type=None, config_file=None):
-    config = {}
-    if config_file is None:
-        config_file = os.environ.get("CONTROLLER_CONFIG_{}".format(controller_name.upper()), "/config/{}-{}.yaml".format(controller_name, controller_type))
+    final_config_file = None
 
+    if controller_name and controller_type:
+        final_config_file = "/config/{}-{}.yaml".format(controller_name, controller_type)
+
+    if config_file:
+        final_config_file = config_file
+
+    if "CONTROLLER_CONFIG" in os.environ:
+        final_config_file = os.environ.get("CONTROLLER_CONFIG")
+
+    if controller_name:
+        final_config_file = os.environ.get("CONTROLLER_CONFIG_{}".format(controller_name.upper()))
+
+    log("Loading config file:", final_config_file)
     try:
-        with open(config_file, 'r') as cf:
-            log("Loading config file:", config_file)
-            config = yaml.safe_load(cf)
+        if final_config_file:
+            with open(final_config_file, 'r') as fp:
+                return yaml.safe_load(fp)
     except FileNotFoundError as ex:
         pass
     except Exception as ex:
-        log("Error loading config[%s:%s]: %s: %s" % (controller_name, controller_type, config_file, str(ex)))
+        log("Error loading config[%s:%s]: %s: %s" % (controller_name, controller_type, final_config_file, str(ex)))
         sys.exit(1)
 
-    return config
+    return {}
 
 
 def load_controller(controller_name, controller_type):

@@ -1,0 +1,15 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "tiny-controllers.fullname" . }}
+  labels:
+    {{- include "tiny-controllers.labels" . | nindent 4 }}
+{{- end }}
+rules:
+{{- range $name, $config := $.Values.controllers }}
+{{- if and $config.enabled $config.clusterRoleRules }}
+{{ $config.clusterRoleRules }}
+{{- end }}
+{{- end }}
+{{- end }}

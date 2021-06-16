@@ -9,71 +9,71 @@ resources:
       - event
       - reconcile
       debug: false
-
-- kind: Job
-  group: batch
-  version: v1
-  reconciler:
-    exec:
-      command: /app/main.py
-      args:
-      - job
-      - reconcile
-      debug: false
-
-- kind: Node
-  group: ""
-  version: v1
-  reconciler:
-    exec:
-      command: /app/main.py
-      args:
-      - node
-      - reconcile
-      debug: false
-
-- kind: PrometheusRules
-  group: monitoring.coreos.com
-  version: v1
-  reconciler:
-    exec:
-      command: /app/main.py
-      args:
-      - patch
-      - reconcile
-      debug: false
-
-- kind: Deployment
-  group: 'apps'
-  version: v1
-  reconciler:
-    exec:
-      command: /app/main.py
-      args:
-      - patch
-      - reconcile
-      debug: false
-
-- kind: PersistentVolume
-  group: ""
-  version: v1
-  reconciler:
-    exec:
-      command: /app/main.py
-      args:
-      - volume
-      - reconcile
-      debug: false
-  references:
-  - group: ""
-    version: v1
-    kind: PersistentVolumeClaim
-    nameFieldPath: ".spec.claimRef.name"
-    namespaceFieldPath: ".spec.claimRef.namespace"
-
-
-webhook:
-  port: 8443
-  tls:
-    certFile: /etc/tls/tls.crt
-    keyFile: /etc/tls/tls.key
+#
+#- kind: Job
+#  group: batch
+#  version: v1
+#  reconciler:
+#    exec:
+#      command: /app/main.py
+#      args:
+#      - job
+#      - reconcile
+#      debug: false
+#
+#- kind: Node
+#  group: ""
+#  version: v1
+#  reconciler:
+#    exec:
+#      command: /app/main.py
+#      args:
+#      - node
+#      - reconcile
+#      debug: false
+#
+#- kind: PrometheusRules
+#  group: monitoring.coreos.com
+#  version: v1
+#  reconciler:
+#    exec:
+#      command: /app/main.py
+#      args:
+#      - patch
+#      - reconcile
+#      debug: false
+#
+#- kind: Deployment
+#  group: 'apps'
+#  version: v1
+#  reconciler:
+#    exec:
+#      command: /app/main.py
+#      args:
+#      - patch
+#      - reconcile
+#      debug: false
+#
+#- kind: PersistentVolume
+#  group: ""
+#  version: v1
+#  reconciler:
+#    exec:
+#      command: /app/main.py
+#      args:
+#      - volume
+#      - reconcile
+#      debug: false
+#  references:
+#  - group: ""
+#    version: v1
+#    kind: PersistentVolumeClaim
+#    nameFieldPath: ".spec.claimRef.name"
+#    namespaceFieldPath: ".spec.claimRef.namespace"
+#
+#
+#webhook:
+#  port: 8443
+#  tls:
+#    certFile: /etc/tls/tls.crt
+#    keyFile: /etc/tls/tls.key

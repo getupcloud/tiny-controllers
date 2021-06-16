@@ -1,0 +1,19 @@
+{{- range $name, $config := $.Values.controllers }}
+{{- if $config.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tiny-controllers.fullname" . }}-{{ $name }}-config
+  labels: {{- include "tiny-controllers.labels" . | nindent 4 }}
+data:
+  config.yaml: |-
+{{ toYaml $config.config | indent 4 }}
+    {{- if and $.Values.validatingwebhook.enabled $config.webhook.enabled }}
+    webhook:
+      port: {{ $config.webhook.port }}
+      tls:
+        certFile: /etc/tls/tls.crt
+        keyFile: /etc/tls/tls.key
+    {{- end }}
+{{- end }}
+{{- end }}

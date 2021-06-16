@@ -1,0 +1,376 @@
+# Default values for tiny-controllers.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: getupcloud/tiny-controllers
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: v0.1.2-test1
+
+replicas: 1
+
+rbac:
+  create: true
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  #
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+service:
+  type: ClusterIP
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+validatingwebhook:
+  ## Set to true in order to enable any of controllers[].webhook
+  enabled: false
+  certmanager:
+    enabled: true
+    clusterissuer: selfsigned
+
+controllers:
+#  example:
+#    enabled: true
+#
+#    monitoring:
+#      enabled: true
+#      port: 8050
+#
+#    webhook:
+#      enabled: true
+#      port: 8051
+#      path: /validate/example
+#      rules:
+#      - apiGroups:
+#        - ""
+#        apiVersions:
+#        - v1
+#        resources:
+#        - namespaces
+#        operations:
+#        - CREATE
+#        - UPDATE
+#
+#    env: []
+#
+#    resources:
+#      limits:
+#        cpu: 10m
+#        memory: 64Mi
+#      requests:
+#        cpu: 10m
+#        memory: 64Mi
+#
+#    securityContext:
+#      capabilities:
+#        drop:
+#        - ALL
+#
+#    config:
+#      resources:
+#      - kind: Event
+#        group: events.k8s.io
+#        version: v1
+#        reconciler:
+#          exec:
+#            command: /app/main.py
+#            args:
+#            - event
+#            - reconcile
+#            debug: false
+
+  event:
+    enabled: true
+
+    monitoring:
+      enabled: true
+      port: 8050
+
+    webhook:
+      enabled: false
+      port: 8051
+
+    env:
+    - name: LOG_LINES
+      value: "true"
+
+    resources:
+      limits:
+        cpu: 10m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+
+    clusterRoleRules:
+    - apiGroups:
+      - ""
+      resources:
+      - events
+      verbs:
+      - get
+      - list
+      - watch
+
+    config:
+      resources:
+      - kind: Event
+        group: events.k8s.io
+        version: v1
+        reconciler:
+          exec:
+            command: /app/main.py
+            args:
+            - event
+            - reconcile
+            debug: false
+
+  job:
+    enabled: false
+
+    monitoring:
+      enabled: true
+      port: 8060
+
+    webhook:
+      enabled: false
+      port: 8061
+
+    env: []
+
+    resources:
+      limits:
+        cpu: 10m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+
+    clusterRoleRules:
+    - apiGroups:
+      - "batch"
+      resources:
+      - jobs
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+
+    config:
+      resources:
+      - kind: Job
+        group: batch
+        version: v1
+        reconciler:
+          exec:
+            command: /app/main.py
+            args:
+            - job
+            - reconcile
+            debug: false
+
+  node:
+    enabled: true
+
+    monitoring:
+      enabled: true
+      port: 8070
+
+    webhook:
+      enabled: false
+      port: 8071
+
+    env: []
+
+    resources:
+      limits:
+        cpu: 10m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+
+    clusterRoleRules:
+    - apiGroups:
+      - ""
+      resources:
+      - nodes
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+
+    config:
+      resources:
+      - kind: Node
+        group: ""
+        version: v1
+        reconciler:
+          exec:
+            command: /app/main.py
+            args:
+            - node
+            - reconcile
+            debug: false
+
+  patch:
+    enabled: false
+
+    monitoring:
+      enabled: true
+      port: 8080
+
+    webhook:
+      enabled: false
+      port: 8081
+
+    env: []
+
+    resources:
+      limits:
+        cpu: 10m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+
+    clusterRoleRules:
+    - apiGroups:
+      - apps
+      - monitoring.coreos.com
+      resources:
+      - deployments
+      - prometheusrules
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+
+    config:
+      resources:
+      - kind: PrometheusRules
+        group: monitoring.coreos.com
+        version: v1
+        reconciler:
+          exec:
+            command: /app/main.py
+            args:
+            - patch
+            - reconcile
+            debug: false
+      - kind: Deployment
+        group: 'apps'
+        version: v1
+        reconciler:
+          exec:
+            command: /app/main.py
+            args:
+            - patch
+            - reconcile
+            debug: false
+
+  volume:
+    enabled: true
+
+    monitoring:
+      enabled: true
+      port: 8090
+
+    webhook:
+      enabled: false
+      port: 8091
+
+    env: []
+
+    resources:
+      limits:
+        cpu: 10m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+
+    clusterRoleRules:
+    - apiGroups:
+      - ""
+      resources:
+      - persistentvolumes
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+    - apiGroups:
+      - ""
+      resources:
+      - persistentvolumeclaims
+      verbs:
+      - get
+      - list
+      - watch
+
+    config:
+      resources:
+      - kind: PersistentVolume
+        group: ""
+        version: v1
+        reconciler:
+          exec:
+            command: /app/main.py
+            args:
+            - volume
+            - reconcile
+            debug: false
+        references:
+        - group: ""
+          version: v1
+          kind: PersistentVolumeClaim
+          nameFieldPath: ".spec.claimRef.name"
+          namespaceFieldPath: ".spec.claimRef.namespace"

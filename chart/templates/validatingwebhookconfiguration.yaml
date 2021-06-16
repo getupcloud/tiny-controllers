@@ -1,0 +1,21 @@
+{{- if .Values.validatingwebhook.enabled }}
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "tiny-controlles.fullname" . }}-$name
+  labels: {{- include "tiny-controllers.labels" . | nindent 4 }}
+  annotations:
+  {{- if $.Values.validatingwebhook.certmanager.enabled }}
+    inject-ca-from: {{ $.Release.Namespace }}/{{ include "tiny-controlles.fullname" . }}-webhook-tls
+  {{- end }}
+webhooks:
+{{- range $name, $config := $.Values.controllers }}
+{{- if and $config.enabled $config.webhook.enabled }}
+- name: {{ $name }}.getup.io
+  rules: {{ toYaml $config.webhook.rules | nindent 4 }}
+  failurePolicy: Ignore
+  clientConfig:
+    url: https://{{ include "tiny-controllers.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $config.webhook.port }}/{{ $config.webhook.path }}
+{{- end }}
+{{- end }}
+{{- end }}
