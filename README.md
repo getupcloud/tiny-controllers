@@ -8,8 +8,8 @@ Tiny kubernetes controllers for tiny common tasks.
 
 Apply labels, annotations and taints from:
 
-- node annotations started with `label.getup.io.$name` and `taint.getup.io.$name.[$value,$operator]`
-- node labels started with `annotation.getup.io.$name` and `taint.getup.io.$name.[$value,$operator]`
+- node annotations with format `label.getup.io.$name=$value` and `taint.getup.io.$key.$value=$effect`
+- node labels with format `annotation.getup.io.$name=$value` and `taint.getup.io.$key.$value=$effect`
 
 Examples:
 
