@@ -5,7 +5,7 @@ import copy
 from controllers import log, execute_command
 
 
-def external_patch(args, obj):
+def command(args, obj):
     output = execute_command(args, stdin_data=json.dumps(obj))
     return json.loads(output) if output is not None else None
 
@@ -15,10 +15,9 @@ def reconcile(state, config, *args):
     kubectl = paths.get('kubectl', 'kubectl')
     jq = paths.get('jq', 'jq')
 
-    for patch in get_patches(obj, config):
+    for patch in get_patches(obj, config, jq):
         if patch['type'] == 'jq':
-            args = [ f'{jq}', f'{patch["patch"]}' ]
-            output = external_patch(args, obj)
+            output = command([ jq, f'{patch["patch"]}' ], obj)
             if output is not None:
                 state['object'] = output
 
@@ -28,7 +27,7 @@ def reconcile(state, config, *args):
             else:
                 json_patch = json.dumps(patch['patch'])
             args = [ f'{kubectl}', 'patch', '--output=json', '--dry-run', f'--type={patch["type"]}', '--filename=-', f"--patch={json_patch}" ]
-            output = external_patch(args, obj)
+            output = command(args, obj)
             if output is not None:
                 state['object'] = output
 
@@ -40,7 +39,7 @@ def reconcile(state, config, *args):
     return state
 
 
-def get_patches(obj, config):
+def get_patches(obj, config, jq):
     kind = obj['kind']
     apiVersion = obj['apiVersion']
     name = obj['metadata']['name']
@@ -55,11 +54,18 @@ def get_patches(obj, config):
                 if 'name' in patch and patch['name'] != name:
                     continue
 
+                ignore = False
+                for match in patch.get('matches', []):
+                    if not command([jq, '-r', match], obj):
+                        log(f'Ignored by non-matching condition: {match}')
+                        ignore = True
+                if ignore:
+                    continue
+
                 for spec in patch['specs']:
                     for patch_type, patch_value in spec.items():
                         if patch_value:
                             yield {
-
                                 'type': patch_type,
                                 'patch': patch_value
                             }

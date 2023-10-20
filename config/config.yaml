@@ -71,6 +71,16 @@ resources:
     nameFieldPath: ".spec.claimRef.name"
     namespaceFieldPath: ".spec.claimRef.namespace"
 
+- kind: Ingress
+  group: networking.k8s.io
+  version: v1
+  reconciler:
+    exec:
+      command: /app/main.py
+      args:
+      - patch
+      - reconcile
+      debug: false
 
 webhook:
   port: 8443

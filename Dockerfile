@@ -1,7 +1,7 @@
 #FROM summerwind/whitebox-controller:latest AS base
 FROM caruccio/whitebox-controller:latest AS base
 
-FROM python:3.6-alpine
+FROM python:3.10-alpine
 
 ARG VERSION
 ARG BUILD_DATE
@@ -11,8 +11,7 @@ ARG COMPILE=true
 ARG KUBECTL_VERSION
 
 COPY --from=base /bin/whitebox-controller /bin/whitebox-controller
-COPY app /app
-COPY config /config
+COPY app/requirements.txt /app/requirements.txt
 
 RUN apk add jq curl bind-tools --no-cache && \
     \
@@ -30,4 +29,8 @@ RUN apk add jq curl bind-tools --no-cache && \
 
 WORKDIR /
 USER nobody
+
+COPY app /app
+COPY config /config
+
 ENTRYPOINT ["/app/entrypoint"]

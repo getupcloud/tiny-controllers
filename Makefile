@@ -1,10 +1,10 @@
-VERSION := v0.1.0
+VERSION := v0.2.0
 REPOSITORY := getupcloud
 IMAGE_NAME := tiny-controllers
 GIT_COMMIT := $(shell git log -n1 --oneline)
 GIT_COMMIT_ID := $(shell git log -n 1 --pretty=format:%h)
 BUILD_DATE := $(shell LC_ALL=C date -u)
-KUBECTL_VERSION := 1.18.12
+KUBECTL_VERSION := 1.25.0
 
 all: docker-build-release help
 
@@ -53,8 +53,13 @@ docker-push-latest:
 
 ## LOCAL DEV
 
+docker-build-dev:
+	docker build . -t $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) \
+        --build-arg VERSION="dev" \
+        --build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
+
 dev: VERSION := $(VERSION)-dev
-dev: tls/tls.crt docker-build-release dev-run
+dev: tls/tls.crt docker-build-dev dev-run
 
 tls/tls.crt:
 	mkdir -p tls
