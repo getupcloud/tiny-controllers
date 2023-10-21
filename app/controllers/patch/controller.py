@@ -57,8 +57,9 @@ def get_patches(obj, config, jq):
                 ignore = False
                 for match in patch.get('matches', []):
                     if not command([jq, '-r', match], obj):
-                        log(f'Ignored by non-matching condition: {match}')
+                        log(f'PatchController: ignored {kind} {namespace}/{name} by non-matching condition: {match}')
                         ignore = True
+
                 if ignore:
                     continue
 
