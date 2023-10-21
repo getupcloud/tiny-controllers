@@ -68,7 +68,7 @@ tls/tls.crt:
 
 dev-run: VERSION := $(VERSION)-dev
 dev-run: tls
-	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) --network=host -u nobody -v $(PWD)/dev-kubeconfig:/.kube/config -v $(PWD)/tls:/etc/tls/ $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(RECONCILER)
+	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) --network=host -u root -e KUBECONFIG=/.kube/config -v $(PWD)/dev-kubeconfig:/.kube/config -v $(PWD)/tls:/etc/tls/ $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(RECONCILER)
 
 test:
 	make -C tests

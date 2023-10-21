@@ -29,7 +29,7 @@ def reconcile(state, config, *args):
         name = name[len(prefix):]
         if name:
             what = prefix.split('.')[1]
-            log('Added {}: {}={}'.format(what, name, value))
+            log('Added {}: {}={}', what, name, value)
             target[name] = value
         return target
 

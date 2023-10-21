@@ -11,7 +11,7 @@ def reconcile(state, config, *args):
         return
 
     if 'orphan' in finalizers:
-        log("Removing finalizer from Job {}/{}: 'orphan'".format(metadata['namespace'], metadata['name']))
+        log("Removing finalizer from Job {}/{}: 'orphan'", metadata['namespace'], metadata['name'])
         finalizers = [ f for f in finalizers if f != 'orphan' ]
 
     state['object']['metadata']['finalizers'] = finalizers

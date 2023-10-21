@@ -1,11 +1,11 @@
 import os
 import sys
-import yaml
+import yaml, json
 import importlib
 import subprocess
 
-def log(*vargs, **kwargs):
-    print(file=sys.stderr, *vargs, **kwargs)
+def log(fmt, *vargs, **kwargs):
+    print(json.dumps({ 'msg': fmt.format(*vargs, **kwargs) }), file=sys.stderr)
 
 
 def load_config(controller_name=None, controller_type=None, config_file=None):
@@ -15,12 +15,12 @@ def load_config(controller_name=None, controller_type=None, config_file=None):
 
     try:
         with open(config_file, 'r') as cf:
-            log("Loading config file:", config_file)
+            log("Loading config file: {}", config_file)
             config = yaml.safe_load(cf)
     except FileNotFoundError as ex:
         pass
     except Exception as ex:
-        log("Error loading config[%s:%s]: %s: %s" % (controller_name, controller_type, config_file, str(ex)))
+        log("Error loading config[{}:{}]: {}: {}", controller_name, controller_type, config_file, str(ex))
         sys.exit(1)
 
     return config
@@ -33,10 +33,9 @@ def load_controller(controller_name, controller_type):
 
 
 def execute_command(args, stdin_data=''):
-    #log(f"execute_command: echo '{stdin_data}' |", ' '.join([ f"'{i}'" for i in args]))
     result = subprocess.run(args=args, input=stdin_data, text=True, capture_output=True)
 
     if result.returncode == 0:
         return result.stdout
 
-    log('Error: execute_command:', result.stderr)
+    log('Error: execute_command: {}', result.stderr)

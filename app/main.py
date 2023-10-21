@@ -22,7 +22,7 @@ if __name__ == "__main__":
         result = func(state, config, *args)
 
         if result is not None:
-            print(json.dumps(result))
+            log(result)
 
         sys.stdout.flush()
         sys.stderr.flush()

@@ -25,7 +25,7 @@ def reconcile(state, config, *args):
         name = name[len(annotation_prefix):]
         if not name:
             continue
-        log('Added annotation: {}={}'.format(name, value))
+        log('Added annotation: {}={}', name, value)
         annotations[name] = value
         changed = True
 
@@ -36,7 +36,7 @@ def reconcile(state, config, *args):
         name = name[len(label_prefix):]
         if not name:
             continue
-        log('Added label: {}={}'.format(name, value))
+        log('Added label: {}={}', name, value)
         labels[name] = value
         changed = True
 
@@ -46,7 +46,6 @@ def reconcile(state, config, *args):
     new_taints = reconcile_taints(annotations, new_taints)
 
     if new_taints != node_taints:
-        log('Nothing to do')
         changed = True
 
     if not changed:
@@ -92,7 +91,7 @@ def reconcile_taints(source, node_taints):
 
         for node_taint in node_taints:
             if equal_taints(node_taint, new_taint):
-                log('Already exists taint: {}'.format(new_taint))
+                log('Already exists taint: {}', new_taint)
                 found = True
 
         if not found:
@@ -100,7 +99,7 @@ def reconcile_taints(source, node_taints):
 
     # add filtered taints
     for taint in taints_to_add:
-        log('Adding taint: {}'.format(taint))
+        log('Adding taint: {}', taint)
         node_taints.append(taint)
 
     return node_taints
