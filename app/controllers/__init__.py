@@ -5,7 +5,7 @@ import importlib
 import subprocess
 
 def log(fmt, *vargs, **kwargs):
-    print(json.dumps({ 'msg': fmt.format(*vargs, **kwargs) }), file=sys.stderr)
+    print(fmt.format(*vargs, **kwargs), file=sys.stderr)
 
 
 def load_config(controller_name=None, controller_type=None, config_file=None):
