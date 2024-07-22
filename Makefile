@@ -27,14 +27,21 @@ check-dirty:
 
 docker-build-release:
 	docker build . -t $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) \
-        --build-arg VERSION="$(VERSION)" \
-        --build-arg BUILD_DATE="$(BUILD_DATE)" \
-        --build-arg GIT_COMMIT="$(GIT_COMMIT)" \
-        --build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)" \
-        --build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
+		--build-arg VERSION="$(VERSION)" \
+		--build-arg BUILD_DATE="$(BUILD_DATE)" \
+		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
+		--build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)" \
+		--build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
+	docker build metrics/ -t $(REPOSITORY)/$(IMAGE_NAME)-metrics:$(VERSION) \
+		--build-arg VERSION="$(VERSION)" \
+		--build-arg BUILD_DATE="$(BUILD_DATE)" \
+		--build-arg GIT_COMMIT="$(GIT_COMMIT)" \
+		--build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)" \
+		--build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
 
 docker-tag-latest:
 	docker tag $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(REPOSITORY)/$(IMAGE_NAME):latest
+	docker tag $(REPOSITORY)/$(IMAGE_NAME)-metrics:$(VERSION) $(REPOSITORY)/$(IMAGE_NAME)-metrics:latest
 
 git-tag-release:
 	git tag $(VERSION)
@@ -47,16 +54,21 @@ git-push-release:
 
 docker-push-release:
 	docker push $(REPOSITORY)/$(IMAGE_NAME):$(VERSION)
+	docker push $(REPOSITORY)/$(IMAGE_NAME)-metrics:$(VERSION)
 
 docker-push-latest:
 	docker push $(REPOSITORY)/$(IMAGE_NAME):latest
+	docker push $(REPOSITORY)/$(IMAGE_NAME)-metrics:latest
 
 ## LOCAL DEV
 
 docker-build-dev:
-	docker build . -t $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) \
-        --build-arg VERSION="dev" \
-        --build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
+	echo docker build . -t $(REPOSITORY)/$(IMAGE_NAME):$(VERSION)-dev \
+		--build-arg VERSION="$(VERSION)-dev" \
+		--build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
+	docker build metrics/ -t $(REPOSITORY)/$(IMAGE_NAME)-metrics:$(VERSION)-dev \
+		--build-arg VERSION="$(VERSION)-dev" \
+		--build-arg KUBECTL_VERSION="$(KUBECTL_VERSION)"
 
 dev: VERSION := $(VERSION)-dev
 dev: tls/tls.crt docker-build-dev dev-run
@@ -68,7 +80,21 @@ tls/tls.crt:
 
 dev-run: VERSION := $(VERSION)-dev
 dev-run: tls
-	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) --network=host -u root -e KUBECONFIG=/.kube/config -v $(PWD)/dev-kubeconfig:/.kube/config -v $(PWD)/tls:/etc/tls/ $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(RECONCILER)
+	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) --network=host -u root \
+		-e KUBECONFIG=/.kube/config \
+		-v $(PWD)/dev-kubeconfig:/.kube/config \
+		-v $(PWD)/tls:/etc/tls/ \
+		$(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(RECONCILER)
+
+dev-run-metrics: VERSION := $(VERSION)-dev
+dev-run-metrics: tls
+	docker run -it --rm --name $(IMAGE_NAME)-metrics-$(VERSION) --network=host -u root \
+		-e KUBECONFIG=/.kube/config \
+		-e METRICS_DATA_DIR=/metrics \
+		-v $(PWD)/metrics:/metrics:ro \
+		-v $(PWD)/dev-kubeconfig:/.kube/config \
+		-v $(PWD)/tls:/etc/tls/ \
+		$(REPOSITORY)/$(IMAGE_NAME)-metrics:$(VERSION)
 
 test:
 	make -C tests
